@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user,\
+    current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
-from wtforms import PasswordField, SubmitField, TextAreaField, StringField, BooleanField
+from wtforms import PasswordField, SubmitField, TextAreaField, StringField, \
+    BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 from data import db_session
@@ -17,10 +19,12 @@ login_manager.init_app(app)
 
 
 class RegisterForm(FlaskForm):
+    name = StringField('Имя пользователя', validators=[DataRequired()])
+
     email = EmailField('Почта', validators=[DataRequired()])
     password = PasswordField('Пароль', validators=[DataRequired()])
-    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
-    name = StringField('Имя пользователя', validators=[DataRequired()])
+    password_again = PasswordField('Повторите пароль',
+                                   validators=[DataRequired()])
     about = TextAreaField("Немного о себе")
     submit = SubmitField('Войти')
 
@@ -51,7 +55,7 @@ def index():
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -86,7 +90,8 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         session = db_session.create_session()
-        user = session.query(User).filter(User.email == form.email.data).first()
+        user = session.query(User).filter(
+            User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -103,7 +108,7 @@ def logout():
     return redirect("/")
 
 
-@app.route('/news',  methods=['GET', 'POST'])
+@app.route('/news', methods=['GET', 'POST'])
 @login_required
 def add_news():
     form = NewsForm()
@@ -147,7 +152,8 @@ def edit_news(id):
             return redirect('/')
         else:
             abort(404)
-    return render_template('news.html', title='Редактирование новости', form=form)
+    return render_template('news.html', title='Редактирование новости',
+                           form=form)
 
 
 @app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
