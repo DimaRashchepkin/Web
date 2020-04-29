@@ -1,9 +1,9 @@
-from PIL import Image
+import os
 from flask import Flask, render_template, request, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, \
     current_user
 from werkzeug.exceptions import abort
-from werkzeug.utils import redirect
+from werkzeug.utils import redirect, secure_filename
 from wtforms import PasswordField, SubmitField, TextAreaField, StringField, \
     BooleanField
 from wtforms.fields.html5 import EmailField
@@ -13,8 +13,12 @@ from data.news import News
 from flask_wtf import FlaskForm
 from data.users import User
 
+UPLOAD_FOLDER = 'static/img/'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 login_manager = LoginManager()
 login_manager.init_app(app)
 
@@ -171,20 +175,29 @@ def news_delete(id):
     return redirect('/')
 
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
 @app.route('/new', methods=['POST', 'GET'])
 def new():
     session = db_session.create_session()
     user = session.query(User).first()
     if request.method == 'GET':
-
-        return render_template('index.html', title='Профиль', photo=url_for('static', filename=user.photo),
+        return render_template('index.html', title='Профиль',
+                               photo=url_for('static', filename=user.photo),
                                name=user.name, surname=user.surname)
-    elif request.method == 'POST':
-        im = open('static/img/' + str(user.id) + '.jpg', mode='wb')
-        im.write(request.form['file'])
-        im.close()
-        user.photo = '/img/' + str(user.id) + '.jpg'
-        session.commit()
+    if request.method == 'POST':
+        file = request.files['file']
+        if file and allowed_file(file.filename):
+            filename = str(user.id) + '.' + file.filename.split('.')[1]
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            user.photo = 'img/' + filename
+            session.commit()
+            return redirect('/new')
+        else:
+            pass
 
 
 def main():

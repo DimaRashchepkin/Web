@@ -3,7 +3,7 @@
 {% block content %}
 <h1>{{name}} {{surname}}</h1>
 <img src={{photo}}>
-<form method="post">
+<form method="post" enctype=multipart/form-data>
     <div>
         <label>Приложите фотографию</label><br>
         <input type="file" class="form-control-file" name="file">
