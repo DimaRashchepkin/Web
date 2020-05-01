@@ -9,7 +9,7 @@
         <label>Приложите фотографию</label><br>
         <input type="file" class="form-control-file" name="file">
     </div>
-    <button type="submit" class="btn btn-primary">Применить</button>
+    <button type="submit">Применить</button>
 </form>
 
 <div>
@@ -26,12 +26,6 @@
     <div>
         Дата написания - {{item.created_date}}
     </div>
-    {% if current_user.is_authenticated and current_user == item.user %}
-    <div>
-        <a href="news/{{ item.id }}" class="btn btn-warning">Изменить</a>
-        <a href="/news_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
-    </div>
-{% endif %}
 </div>
 {% endfor %}
 
