@@ -181,37 +181,48 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-def resize(path, size):
+def resize(path):
     image = Image.open(path)
-    resized_image = image.resize(size)
+    w, h = image.size
+    if w > h:
+        resized_image = image.resize((250, 200))
+    elif w < h:
+        resized_image = image.resize((200, 250))
+    else:
+        resized_image = image.resize((200, 200))
     resized_image.save(path)
 
 
 @app.route('/new', methods=['POST', 'GET'])
 def new():
     session = db_session.create_session()
+
     if request.method == 'GET':
         user = session.query(User).first()
-        return render_template('index.html', title='Профиль',
-                               photo=url_for('static', filename=user.photo),
-                               name=user.name, surname=user.surname)
+        news = session.query(News).filter((News.user == user))
+        param = {
+            'title': 'Профиль',
+            'name': user.name,
+            'surname': user.surname,
+            'photo': url_for('static', filename=user.photo),
+            'about': [user.about if user.about else 'Здесь пока ничего нет!'][
+                0],
+            'news': news}
+        return render_template('index.html', **param)
+
     if request.method == 'POST':
         user = session.query(User).first()
         file = request.files['file']
-
         if file and allowed_file(file.filename):
             os.remove('static/img/' + str(user.id) + '(' + str(
                 user.photo_id) + ').' + user.photo.split('.')[-1])
-
             user.photo_id += 1
             filename = str(user.id) + '(' + str(user.photo_id) + ').' + \
                        file.filename.split('.')[1]
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
             user.photo = 'img/' + filename
             session.commit()
-
-            resize('static/' + user.photo, size=(300, 200))
+            resize('static/' + user.photo)
             return redirect('/new')
         else:
             pass

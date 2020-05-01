@@ -1,8 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{name}} {{surname}}</h1>
+<h1>{{ name }} {{ surname }}</h1>
 <img src={{photo}}>
+
 <form method="post" enctype=multipart/form-data>
     <div>
         <label>Приложите фотографию</label><br>
@@ -10,4 +11,28 @@
     </div>
     <button type="submit" class="btn btn-primary">Применить</button>
 </form>
+
+<div>
+    <p>Немного о себе:</p>
+    {{ about }}
+</div>
+
+{% for item in news%}
+<div>
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.content}}
+    </div>
+    <div>
+        Дата написания - {{item.created_date}}
+    </div>
+    {% if current_user.is_authenticated and current_user == item.user %}
+    <div>
+        <a href="news/{{ item.id }}" class="btn btn-warning">Изменить</a>
+        <a href="/news_delete/{{ item.id }}" class="btn btn-danger">Удалить</a>
+    </div>
+{% endif %}
+</div>
+{% endfor %}
+
 {% endblock %}
