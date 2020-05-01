@@ -1,4 +1,5 @@
 import os
+from PIL import Image
 from flask import Flask, render_template, request, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, \
     current_user
@@ -180,21 +181,37 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
+def resize(path, size):
+    image = Image.open(path)
+    resized_image = image.resize(size)
+    resized_image.save(path)
+
+
 @app.route('/new', methods=['POST', 'GET'])
 def new():
     session = db_session.create_session()
-    user = session.query(User).first()
     if request.method == 'GET':
+        user = session.query(User).first()
         return render_template('index.html', title='Профиль',
                                photo=url_for('static', filename=user.photo),
                                name=user.name, surname=user.surname)
     if request.method == 'POST':
+        user = session.query(User).first()
         file = request.files['file']
+
         if file and allowed_file(file.filename):
-            filename = str(user.id) + '.' + file.filename.split('.')[1]
+            os.remove('static/img/' + str(user.id) + '(' + str(
+                user.photo_id) + ').' + user.photo.split('.')[-1])
+
+            user.photo_id += 1
+            filename = str(user.id) + '(' + str(user.photo_id) + ').' + \
+                       file.filename.split('.')[1]
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
             user.photo = 'img/' + filename
             session.commit()
+
+            resize('static/' + user.photo, size=(300, 200))
             return redirect('/new')
         else:
             pass

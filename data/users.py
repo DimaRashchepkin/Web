@@ -17,6 +17,7 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String,
                               index=True, unique=True, nullable=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    photo_id = sqlalchemy.Column(sqlalchemy.Integer, nullable=True, default=0)
     photo = sqlalchemy.Column(sqlalchemy.String, default='img/default.jpg')
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
