@@ -18,6 +18,8 @@ UPLOAD_FOLDER = 'static/img/'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -50,12 +52,33 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Зарегистрироваться')
 
 
-@app.route('/', methods=['POST', 'GET'])
-def new():
-    session = db_session.create_session()
+class LoginForm(FlaskForm):
+    email = EmailField('Логин', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
 
+
+@login_manager.user_loader
+def load_user(user_id):
+    session = db_session.create_session()
+    return session.query(User).get(user_id)
+
+
+@app.route('/')
+def start():
+    if current_user.is_authenticated:
+        return redirect('/user/{}'.format(current_user.id))
+    else:
+        return redirect('/login')
+
+
+@app.route('/user/<int:id>', methods=['POST', 'GET'])
+@login_required
+def user(id):
+    session = db_session.create_session()
     if request.method == 'GET':
-        user = session.query(User).first()
+        user = session.query(User).filter(User.id == id).first()
         news = session.query(News).filter((News.user == user))
         param = {
             'title': 'Профиль',
@@ -83,6 +106,55 @@ def new():
             return redirect('/new')
         else:
             pass
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def reqister():
+    form = RegisterForm()
+    session = db_session.create_session()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароли не совпадают")
+        if session.query(User).filter(User.email == form.email.data).first():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Такой пользователь уже есть")
+        user = User(
+            name=form.name.data,
+            surname=form.surname.data,
+            email=form.email.data,
+            about=form.about.data
+        )
+        user.set_password(form.password.data)
+        session.add(user)
+        session.commit()
+        return redirect('/')
+    return render_template('register.html', title='Регистрация', form=form)
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        user = session.query(User).filter(
+            User.email == form.email.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect('/user/{}'.format(user.id))
+        return render_template('login.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('login.html', title='Авторизация', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/login")
 
 
 def main():

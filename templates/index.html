@@ -13,13 +13,15 @@
 </form>
 
 <div>
-    <p>Немного о себе:</p>
-    {{ about }}
+    <h4>Немного о себе:</h4>
+    <div>{{ about }}</div>
 </div>
 
-{% for item in news%}
+<h2>Новости:</h2>
+{% if news.first() %}
+{% for item in news %}
 <div>
-    <h2>{{item.title}}</h2>
+    <h3>{{item.title}}</h3>
     <div>
         {{item.content}}
     </div>
@@ -28,5 +30,8 @@
     </div>
 </div>
 {% endfor %}
+{% else %}
+<p>Здесь пока ничего нет!</p>
+{% endif %}
 
 {% endblock %}
