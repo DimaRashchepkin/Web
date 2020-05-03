@@ -8,17 +8,17 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-light bg-light">
+    <nav>
         {% if current_user.is_authenticated %}
         <p>
-        <a class="navbar-brand" href="/logout">{{ current_user.name }} {{
-            current_user.surname }}</a>
+            <a href="/user/{{ current_user.id }}">{{ current_user.name }} {{
+                current_user.surname }}</a>
         </p>
-        <a class="navbar-brand" href="/logout">Выйти</a>
+        <a href="/logout">Выйти</a>
         {% else %}
         <p>
-            <a class="btn btn-primary " href="/register">Зарегистрироваться</a>
-            <a class="btn btn-success" href="/login">Войти</a>
+            <a href="/register">Зарегистрироваться</a>
+            <a href="/login">Войти</a>
         </p>
         {% endif %}
     </nav>

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ name }} {{ surname }}</h1>
-<img src={{photo}}>
+<h1>{{ user.name }} {{ user.surname }}</h1>
+<img src="/static/{{ user.photo }}">
 
+{% if current_user.id == user.id %}
 <form method="post" enctype=multipart/form-data>
     <div>
         <label>Приложите фотографию</label><br>
@@ -11,23 +12,42 @@
     </div>
     <button type="submit">Применить</button>
 </form>
+{% endif %}
 
 <div>
     <h4>Немного о себе:</h4>
-    <div>{{ about }}</div>
+    <div>
+        {% if user.about %}
+        <p>{{ user.about }}</p>
+        {% else %}
+        <p>Здесь пока ничего нет!</p>
+        {% endif %}
+    </div>
+    {% if current_user.id == user.id %}
+    <a href="/user/{{ user.id }}/about">Изменить</a>
+    {% endif %}
 </div>
 
 <h2>Новости:</h2>
+{% if current_user.id == user.id %}
+<a href="/news">Добавить новость</a>
+{% endif %}
 {% if news.first() %}
-{% for item in news %}
+{% for item in news[::-1] %}
 <div>
     <h3>{{item.title}}</h3>
     <div>
         {{item.content}}
     </div>
     <div>
-        Дата написания - {{item.created_date}}
+        <i>Дата написания - {{item.created_date}}</i>
     </div>
+    {% if current_user == item.user %}
+    <div>
+        <a href="/news/{{ item.id }}">Изменить</a>
+        <a href="/news_delete/{{ item.id }}">Удалить</a>
+    </div>
+    {% endif %}
 </div>
 {% endfor %}
 {% else %}

@@ -59,6 +59,17 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Войти')
 
 
+class NewsForm(FlaskForm):
+    title = StringField('Заголовок', validators=[DataRequired()])
+    content = TextAreaField("Содержание")
+    submit = SubmitField('Применить')
+
+
+class AboutForm(FlaskForm):
+    content = TextAreaField("Содержание")
+    submit = SubmitField('Применить')
+
+
 @login_manager.user_loader
 def load_user(user_id):
     session = db_session.create_session()
@@ -82,11 +93,8 @@ def user(id):
         news = session.query(News).filter((News.user == user))
         param = {
             'title': 'Профиль',
-            'name': user.name,
-            'surname': user.surname,
+            'user': user,
             'photo': url_for('static', filename=user.photo),
-            'about': [user.about if user.about else 'Здесь пока ничего нет!'][
-                0],
             'news': news}
         return render_template('index.html', **param)
 
@@ -109,7 +117,7 @@ def user(id):
 
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     session = db_session.create_session()
     if form.validate_on_submit():
@@ -155,6 +163,92 @@ def login():
 def logout():
     logout_user()
     return redirect("/login")
+
+
+@app.route('/news', methods=['GET', 'POST'])
+@login_required
+def add_news():
+    form = NewsForm()
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        news = News()
+        news.title = form.title.data
+        news.content = form.content.data
+        current_user.news.append(news)
+        session.merge(current_user)
+        session.commit()
+        return redirect('/user/{}'.format(current_user.id))
+    return render_template('news.html', title='Добавление новости',
+                           form=form)
+
+
+@app.route('/news/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_news(id):
+    form = NewsForm()
+    if request.method == "GET":
+        session = db_session.create_session()
+        news = session.query(News).filter(News.id == id,
+                                          News.user == current_user).first()
+        if news:
+            form.title.data = news.title
+            form.content.data = news.content
+        else:
+            abort(404)
+    if form.validate_on_submit():
+        session = db_session.create_session()
+        news = session.query(News).filter(News.id == id,
+                                          News.user == current_user).first()
+        if news:
+            news.title = form.title.data
+            news.content = form.content.data
+            session.commit()
+            return redirect('/user/{}'.format(current_user.id))
+        else:
+            abort(404)
+    return render_template('news.html', title='Редактирование новости',
+                           form=form)
+
+
+@app.route('/news_delete/<int:id>', methods=['GET', 'POST'])
+@login_required
+def news_delete(id):
+    session = db_session.create_session()
+    news = session.query(News).filter(News.id == id,
+                                      News.user == current_user).first()
+    if news:
+        session.delete(news)
+        session.commit()
+    else:
+        abort(404)
+    return redirect('/user/{}'.format(current_user.id))
+
+
+@app.route('/user/<int:id>/about', methods=['GET', 'POST'])
+@login_required
+def edit_about(id):
+    if current_user.id == id:
+        form = AboutForm()
+        if request.method == "GET":
+            session = db_session.create_session()
+            user = session.query(User).filter(User.id == id).first()
+            if user:
+                form.content.data = user.about
+            else:
+                abort(404)
+        if form.validate_on_submit():
+            session = db_session.create_session()
+            user = session.query(User).filter(User.id == id).first()
+            if user:
+                user.about = form.content.data
+                session.commit()
+                return redirect('/user/{}'.format(current_user.id))
+            else:
+                abort(404)
+        return render_template('about.html', title='Немного о себе',
+                               form=form)
+    else:
+        return 'Эта страница принадлежит не вам!'
 
 
 def main():

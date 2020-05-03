@@ -1,29 +1,30 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Авторизация</h1>
+    <h1>Добро пожаловать в ... (придумать название)!</h1>
+    <h2>Авторизация</h2>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
             {{ form.email.label }}<br>
-            {{ form.email(class="form-control", type="email") }}<br>
+            {{ form.email(type="email") }}<br>
             {% for error in form.email.errors %}
-                <div class="alert alert-danger" role="alert">
+                <div role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
         <p>
             {{ form.password.label }}<br>
-            {{ form.password(class="form-control", type="password") }}<br>
+            {{ form.password(type="password") }}<br>
             {% for error in form.password.errors %}
-                <div class="alert alert-danger" role="alert">
+                <div role="alert">
                     {{ error }}
                 </div>
             {% endfor %}
         </p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <p>{{ form.submit(type="submit") }}</p>
         <div>{{ message }}</div>
     </form>
 
