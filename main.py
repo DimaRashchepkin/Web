@@ -94,7 +94,6 @@ def user(id):
         param = {
             'title': 'Профиль',
             'user': user,
-            'photo': url_for('static', filename=user.photo),
             'news': news}
         return render_template('index.html', **param)
 
@@ -249,6 +248,14 @@ def edit_about(id):
                                form=form)
     else:
         return 'Эта страница принадлежит не вам!'
+
+
+@app.route('/users')
+@login_required
+def users():
+    session = db_session.create_session()
+    users = session.query(User).filter(User.id != current_user.id)
+    return render_template('users.html', users=users)
 
 
 def main():

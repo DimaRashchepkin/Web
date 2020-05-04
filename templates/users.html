@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Список пользователей</h1>
+{% for user in users %}
+<div>
+    <h3>
+        <a href="/user/{{ user.id }}">{{ user.name }} {{ user.surname }}</a>
+    </h3>
+    <div>
+        <img src="/static/{{ user.photo }}">
+    </div>
+    <div>
+        {{ user.about }}
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
