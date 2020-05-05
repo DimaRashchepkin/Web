@@ -13,8 +13,11 @@
         <p>
             <a href="/user/{{ current_user.id }}">{{ current_user.name }} {{
                 current_user.surname }}</a>
+            <a href="/logout">Выйти</a>
         </p>
-        <a href="/logout">Выйти</a>
+        <p>
+            <a href="/users">Список пользователей</a>
+        </p>
         {% else %}
         <p>
             <a href="/register">Зарегистрироваться</a>

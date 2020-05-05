@@ -3,18 +3,42 @@
 {% block content %}
 
 <h1>Список пользователей</h1>
-{% for user in users %}
-<div>
-    <h3>
-        <a href="/user/{{ user.id }}">{{ user.name }} {{ user.surname }}</a>
-    </h3>
-    <div>
-        <img src="/static/{{ user.photo }}">
-    </div>
-    <div>
-        {{ user.about }}
-    </div>
-</div>
-{% endfor %}
+<h2>Поиск</h2>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.name.label }}<br>
+        {{ form.name }}<br>
+        {% for error in form.name.errors %}
+            <div role="alert">
+                {{ error }}
+            </div>
+        {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit") }}</p>
+</form>
+
+{% if users.first() %}
+    {% for user in users %}
+        <div>
+            <h3>
+                <a href="/user/{{ user.id }}">{{ user.name }} {{ user.surname }}</a>
+            </h3>
+            <div>
+                <img src="/static/{{ user.photo }}">
+            </div>
+            <div>
+                {% if user.about %}
+                    <p>{{ user.about }}</p>
+                {% else %}
+                    <p>Здесь пока ничего нет!</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <h4>Таких пользователей нет!</h4>
+{% endif %}
+
 
 {% endblock %}

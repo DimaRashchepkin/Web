@@ -3,8 +3,12 @@
 {% block content %}
 
 <h1>{{ user.name }} {{ user.surname }}</h1>
-<img src="/static/{{ user.photo }}">
-
+<div>
+    <a href="/chat/{{ current_user.id }}_{{ user.id }}">Написать сообщение</a>
+</div>
+<div>
+    <img src="/static/{{ user.photo }}">
+</div>
 {% if current_user.id == user.id %}
 <form method="post" enctype=multipart/form-data>
     <div>
@@ -16,7 +20,7 @@
 {% endif %}
 
 <div>
-    <h4>Немного о себе:</h4>
+    <h3>Немного о себе:</h3>
     <div>
         {% if user.about %}
         <p>{{ user.about }}</p>
