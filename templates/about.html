@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Немного о себе</h1>
-<form action="" method="post">
-    {{ form.hidden_tag() }}a
+<h1 class="edit-header">Немного о себе</h1>
+<form class="edit-form" action="" method="post">
+    {{ form.hidden_tag() }}
     {{ form.csrf_token }}
     <p>
         {{ form.content.label }}<br>

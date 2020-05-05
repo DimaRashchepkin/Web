@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<form action="" method="post">
+<h1 class="edit-header">{{ title }}</h1>
+<form class="edit-form" action="" method="post">
     {{ form.hidden_tag() }}
     {{ form.csrf_token }}
     <p>
@@ -23,7 +23,7 @@
             </p>
         {% endfor %}
     </p>
-    <p>{{ form.submit(type="submit") }}</p>
+    <p class="button">{{ form.submit(type="submit") }}</p>
     {{message}}
 </form>
 {% endblock %}
