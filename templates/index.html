@@ -1,21 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
+<div class="user-page">
+<h1 class="name">{{ user.name }} {{ user.surname }}</h1>
 
-<h1>{{ user.name }} {{ user.surname }}</h1>
+<div class="user-block">
 <img src="/static/{{ user.photo }}">
 
 {% if current_user.id == user.id %}
 <form method="post" enctype=multipart/form-data>
-    <div>
+    <div class="def-block">
         <label>Приложите фотографию</label><br>
         <input type="file" class="form-control-file" name="file">
     </div>
-    <button type="submit">Применить</button>
+    <button class="def-block" type="submit">Применить</button>
 </form>
 {% endif %}
+</div>
 
-<div>
+<div class="user-block">
     <h4>Немного о себе:</h4>
     <div>
         {% if user.about %}
@@ -28,8 +31,10 @@
     <a href="/user/{{ user.id }}/about">Изменить</a>
     {% endif %}
 </div>
+</div>
 
-<h2>Новости:</h2>
+<h2 class="user-news-header">Новости</h2>
+<div class="user-news">
 {% if current_user.id == user.id %}
 <a href="/news">Добавить новость</a>
 {% endif %}
@@ -54,5 +59,6 @@
 {% else %}
 <p>Здесь пока ничего нет!</p>
 {% endif %}
+</div>
 
 {% endblock %}

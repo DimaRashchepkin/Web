@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{{title}}</title>
@@ -10,15 +11,15 @@
 <header>
     <nav>
         {% if current_user.is_authenticated %}
-        <p>
+        <p class="name-button">
             <a href="/user/{{ current_user.id }}">{{ current_user.name }} {{
                 current_user.surname }}</a>
         </p>
-        <a href="/logout">Выйти</a>
+        <a href="/logout" class="logout">Выйти</a>
         {% else %}
         <p>
-            <a href="/register">Зарегистрироваться</a>
-            <a href="/login">Войти</a>
+            <a class="top-button" href="/register">Зарегистрироваться</a>
+            <a class="top-button" href="/login">Войти</a>
         </p>
         {% endif %}
     </nav>
