@@ -3,6 +3,7 @@ from PIL import Image
 from flask import Flask, render_template, request, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, \
     current_user
+from sqlalchemy import or_, and_
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from wtforms import PasswordField, SubmitField, TextAreaField, StringField, \
@@ -10,6 +11,7 @@ from wtforms import PasswordField, SubmitField, TextAreaField, StringField, \
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired
 from data import db_session
+from data.messages import Messages
 from data.news import News
 from flask_wtf import FlaskForm
 from data.users import User
@@ -70,6 +72,16 @@ class AboutForm(FlaskForm):
     submit = SubmitField('Применить')
 
 
+class UsersForm(FlaskForm):
+    name = StringField('Имя', validators=[DataRequired()])
+    submit = SubmitField('Применить')
+
+
+class MessagesForm(FlaskForm):
+    content = StringField("Сообщение", validators=[DataRequired()])
+    submit = SubmitField('Отправить')
+
+
 @login_manager.user_loader
 def load_user(user_id):
     session = db_session.create_session()
@@ -95,14 +107,15 @@ def user(id):
             'title': 'Профиль',
             'user': user,
             'news': news}
-        return render_template('index.html', **param)
+        return render_template('user.html', **param)
 
     if request.method == 'POST':
-        user = session.query(User).first()
+        user = session.query(User).filter(User.id == id).first()
         file = request.files['file']
         if file and allowed_file(file.filename):
-            os.remove('static/img/' + str(user.id) + '(' + str(
-                user.photo_id) + ').' + user.photo.split('.')[-1])
+            if user.photo != 'img/default.jpg':
+                os.remove('static/img/' + str(user.id) + '(' + str(
+                    user.photo_id) + ').' + user.photo.split('.')[-1])
             user.photo_id += 1
             filename = str(user.id) + '(' + str(user.photo_id) + ').' + \
                        file.filename.split('.')[-1]
@@ -110,7 +123,7 @@ def user(id):
             user.photo = 'img/' + filename
             session.commit()
             resize('static/' + user.photo)
-            return redirect('/new')
+            return redirect('/user/{}'.format(user.id))
         else:
             pass
 
@@ -250,16 +263,51 @@ def edit_about(id):
         return 'Эта страница принадлежит не вам!'
 
 
-@app.route('/users')
+@app.route('/users', methods=['POST', 'GET'])
 @login_required
 def users():
+    form = UsersForm()
     session = db_session.create_session()
+    if form.validate_on_submit():
+        users = session.query(User).filter(User.id != current_user.id,
+                                           User.name.like(
+                                               '%' + form.name.data + '%'))
+        return render_template('users.html', users=users, form=form)
     users = session.query(User).filter(User.id != current_user.id)
-    return render_template('users.html', users=users)
+    return render_template('users.html', users=users, form=form)
+
+
+@app.route('/chat/<string:id>', methods=['POST', 'GET'])
+@login_required
+def chat(id):
+    form = MessagesForm()
+    session = db_session.create_session()
+    user = session.query(User).filter(User.id == id.split('_')[1]).first()
+    if form.validate_on_submit():
+        message = Messages()
+        message.content = form.content.data
+        message.from_id = current_user.id
+        message.to_id = id.split('_')[1]
+        session.add(message)
+        session.commit()
+        messages = session.query(Messages).filter(
+            or_(and_(Messages.from_id == current_user.id,
+                     Messages.to_id == id.split('_')[1]),
+                and_(Messages.from_id == id.split('_')[1],
+                     Messages.to_id == current_user.id)))
+        return render_template('messages.html', form=form, user=user,
+                               messages=messages)
+    messages = session.query(Messages).filter(
+        or_(and_(Messages.from_id == current_user.id,
+                 Messages.to_id == id.split('_')[1]),
+            and_(Messages.from_id == id.split('_')[1],
+                 Messages.to_id == current_user.id)))
+    return render_template('messages.html', form=form, user=user,
+                           messages=messages)
 
 
 def main():
-    db_session.global_init("db/blogs.sqlite")
+    db_session.global_init("db/network.sqlite")
     app.run()
 
 
