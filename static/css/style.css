@@ -24,6 +24,7 @@ body {
     font-size: 45px;
     text-transform: uppercase;
     font-weight: 100;
+    padding-top: 50px;
     margin: auto;
 }
 
@@ -32,7 +33,6 @@ body {
     text-align: center;
     font-size: 20px;
     text-transform: uppercase;
-    font-weight: 300;
     margin-bottom: 0;
 }
 
@@ -64,16 +64,6 @@ body {
     max-weight: 200px;
 }
 
-.name-button {
-    margin: 0 1675px 30px 0;
-    text-align: center;
-    background-color: #add19a;
-    padding: 7px;
-    background-position: right;
-    text-color: black;
-    border: 1px outset #a1a1a1;
-}
-
 .name {
     margin-left: 0;
     padding: 5px;
@@ -90,13 +80,14 @@ body {
 }
 
 .user-page {
+    margin-top: 30px;
     margin-left: 30%;
 }
 
 .user-news-header {
     position: absolute;
     margin-left: 44%;
-    margin-top: 15%;
+    margin-top: 300px;
     text-align: center;
     font-size: 30px;
 }
@@ -104,7 +95,7 @@ body {
 .user-news {
     position: absolute;
     margin-left: 33%;
-    margin-top: 17%;
+    margin-top: 350px;
     padding: 15px;
 }
 
@@ -121,15 +112,30 @@ body {
     font-weight: bold;
 }
 
-.button {
-    background-color: white;
-    border: 0 inset #a1a1a1
-    text-transform: uppercase;
-    text-color: black;
-    padding: 5px;
+.btn {
+    margin: 5px;
+    margin-left: 25px;
 }
 
 .one-news {
     border: 1px solid #848484;
     padding: 10px;
+    padding-right: 45px;
+    margin: auto;
+}
+
+.users {
+    float: left;
+    margin: 30px;
+}
+
+.edit-btn {
+    float: left;
+    margin-left: 5px;
+    margin-top: 20px;
+}
+
+.logo {
+    position: absolute;
+    margin: 0 45%;
 }

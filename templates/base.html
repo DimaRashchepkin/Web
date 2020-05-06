@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image" href="/static/img/fav.png">
     <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
     <meta name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,17 +11,27 @@
 <body>
 <header>
     <nav>
+        <img src="/static/img/logo.png" class="logo">
         {% if current_user.is_authenticated %}
-        <p class="name-button">
-            <a href="/user/{{ current_user.id }}">{{ current_user.name }} {{
-                current_user.surname }}</a>
-        </p>
-        <a href="/logout" class="logout">Выйти</a>
+        <form>
+            <input class="top-button" type="button" value="{{
+                current_user.name
+                }} {{
+                current_user.surname }}"
+                   onclick="window.location.href = '/user/{{ current_user.id }}';">
+            <input class="top-button" type="button" value="Пользователи"
+                   onclick="window.location.href = '/users';">
+        </form>
+
+        <input class="logout" type="button" value="Выйти"
+                   onclick="window.location.href = '/logout';">
         {% else %}
-        <p>
-            <a class="top-button" href="/register">Зарегистрироваться</a>
-            <a class="top-button" href="/login">Войти</a>
-        </p>
+        <form>
+            <input class="top-button" type="button" value="Зарегистрироваться"
+                   onclick="window.location.href = '/register';">
+            <input class="top-button" type="button" value="Войти"
+                   onclick="window.location.href = '/login';">
+        </form>
         {% endif %}
     </nav>
 </header>

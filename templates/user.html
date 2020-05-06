@@ -17,7 +17,9 @@
 </form>
 {% endif %}
 <div>
-    <a href="/chat/{{ current_user.id }}_{{ user.id }}">Написать сообщение</a>
+    <input class="btn" type="image"
+           onclick="window.location.href = '/chat/{{ current_user.id }}_{{ user.id }}';"
+           value="" src="/static/img/plus.png">
 </div>
 </div>
 
@@ -29,17 +31,21 @@
         {% else %}
         <p>Здесь пока ничего нет!</p>
         {% endif %}
+
     </div>
-    {% if current_user.id == user.id %}
-    <a href="/user/{{ user.id }}/about">Изменить</a>
+</div>{% if current_user.id == user.id %}
+    <input class="edit-btn" type="image"
+           onclick="window.location.href = '/user/{{ user.id }}/about';"
+           value="Изменить" src="/static/img/pencil.png">
     {% endif %}
-</div>
 </div>
 
 <h2 class="user-news-header">Новости</h2>
 <div class="user-news">
 {% if current_user.id == user.id %}
-<a href="/news">Добавить новость</a>
+    <input class="btn" type="image"
+           onclick="window.location.href = '/news';"
+           value="" src="/static/img/plus-news.png">
 {% endif %}
 {% if news.first() %}
 {% for item in news[::-1] %}
@@ -52,10 +58,12 @@
         <i>Дата написания - {{item.created_date}}</i>
     </div>
     {% if current_user == item.user %}
-    <div>
-        <a href="/news/{{ item.id }}">Изменить</a>
-        <a href="/news_delete/{{ item.id }}">Удалить</a>
-    </div>
+    <form>
+        <input class="btn" type="button" value="Изменить"
+                   onclick="window.location.href = '/news/{{ item.id }}';">
+        <input class="btn" type="button" value="Удалить"
+                   onclick="window.location.href = '/news_delete/{{ item.id }}';">
+    </form>
     {% endif %}
 </div>
 {% endfor %}
