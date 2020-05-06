@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ user.name }} {{ user.surname }}</h1>
-<form action="" method="post">
+<h1 class="edit-header">{{ user.name }} {{ user.surname }}</h1>
+<form class='edit-form' action="" method="post">
     {{ form.hidden_tag() }}
     <p>
         {{ form.content.label }}<br>
@@ -17,7 +17,7 @@
 </form>
 
 {% for item in messages[::-1] %}
-    <div>
+    <div class="message">
         {% if current_user.id == item.from_id %}
             <p><b>{{ current_user.name }}</b> {{ item.created_date[11:16] }}</p>
             <p>{{ item.content }}</p>
